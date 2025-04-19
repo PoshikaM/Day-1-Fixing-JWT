@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const userRoutes = require("./routes/userRoutes");
 
+const userModel = require("./models/User");
+
 const app = express();
 
 // Middleware
@@ -13,9 +15,15 @@ app.use(cors());
 // Routes
 app.use("/api/users", userRoutes);
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("Connected to MongoDB"))
-  .catch(err => console.error(err));
+app.get("/", async (req, res) => {
+  const data = await userModel.find();
+  res.send({ data, message: "data fetched" });
+});
 
-app.listen(5000, () => console.log("Server running on port 5000"));
+// Connect to MongoDB
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then((res) => console.log("Connected to MongoDB", res.connection.host))
+  .catch((err) => console.error(err));
+
+app.listen(5001, () => console.log("Server running on port 5001"));
